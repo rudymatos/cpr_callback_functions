@@ -2,19 +2,11 @@ import Vapor
 
 /// Register your application's routes here.
 public func routes(_ router: Router) throws {
-    // Basic "It works" example
-    router.get { req in
-        return "It works!"
+    router.get("cpr-callback-functions/callback/twitter"){ request -> Response in
+            guard let oauthToken = try? request.query.get(String.self, at: "oauth_token"), let oauthTokenSecret = try? request.query.get(String.self, at: "oauth_token_secret"), let oauthCallbackConfirmed = try? request.query.get(Bool.self, at: "oauth_callback_confirmed") else {
+                return request.redirect(to: "OAuthTesting://oauth-swift/twitter")
+            }
+        let queryString = "oauth_token=\(oauthToken)&oauth_token_secret=\(oauthTokenSecret)&oauth_callback_confirmed=\(oauthCallbackConfirmed)"
+        return request.redirect(to: "OAuthTesting://oauth-swift/twitter?\(queryString)")
     }
-    
-    // Basic "Hello, world!" example
-    router.get("hello") { req in
-        return "Hello, world!"
-    }
-
-    // Example of configuring a controller
-    let todoController = TodoController()
-    router.get("todos", use: todoController.index)
-    router.post("todos", use: todoController.create)
-    router.delete("todos", Todo.parameter, use: todoController.delete)
 }
