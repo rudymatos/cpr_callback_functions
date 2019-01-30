@@ -12,13 +12,10 @@ public func routes(_ router: Router) throws {
     }
     
     router.get("cpr-callback-functions/callback/pinterest"){ request -> Response in
-        print(request.query)
-        guard let state = try? request.query.get(String.self, at: "state"), let code = try? request.query.get(String.self, at: "code") else {
+        guard let queryString = request.http.url.query?.replacingOccurrences(of: "state,", with: "state=").replacingOccurrences(of: "code,", with: "code="),
+            queryString.split(separator:"&").count >= 2 else {
             return request.redirect(to: "OAuthTesting://oauth-swift/pinterest")
         }
-        print(state)
-        print(code)
-        let queryString = "state=\(state)&code=\(code)"
         return request.redirect(to: "OAuthTesting://oauth-swift/pinterest?\(queryString)")
     }
     
